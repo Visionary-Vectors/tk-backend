@@ -1,0 +1,26 @@
+{
+  "name": "tk-backend",
+  "version": "1.0.0",
+  "description": "Backend workflow for TazaKart",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Visionary-Vectors/tk-backend.git"
+  },
+  "author": "Jasdeep Singh and Dhruvjot Singh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Visionary-Vectors/tk-backend/issues"
+  },
+  "homepage": "https://github.com/Visionary-Vectors/tk-backend#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
