@@ -28,6 +28,8 @@ exports.createUser = async (req, res) => {
 
     const user_id = user.user.id;
 
+    console.log('User created in Supabase:', user);
+
     // 2. Insert into vendor or supplier table based on role
     if (role === 'VENDOR') {
       await pool.query(
