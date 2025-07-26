@@ -1,4 +1,3 @@
-const supabase = require('../config/db'); // now using supabase client
 const { createClient } = require('@supabase/supabase-js');
 
 const supabase = createClient(
