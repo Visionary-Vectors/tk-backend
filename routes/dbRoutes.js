@@ -5,7 +5,7 @@ const pool = require('../config/db');
 // Get all vendors
 router.get('/', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM vendors');
+    const result = await pool.query('SELECT * FROM vendor');
     res.json(result.rows);
   } catch (err) {
     console.error(err);
