@@ -36,32 +36,51 @@ exports.createUser = async (req, res) => {
 
     const user_id = user.user.id;
 
-    // ✅ Insert into the appropriate table
-    let insertQuery, values;
-
-    if (role === 'VENDOR') {
-      insertQuery = `INSERT INTO vendor (vendor_id, vendor_name, phone_number, email, work)
-                     VALUES ($1, $2, $3, $4, $5)`;
-      values = [user_id, display_name, phone_number, email, work];
-    } else if (role === 'SUPPLIER') {
-      insertQuery = `INSERT INTO suppliers (supplier_id, supplier_name, phone_number, email, work)
-                     VALUES ($1, $2, $3, $4, $5)`;
-      values = [user_id, display_name, phone_number, email, work];
-    } else {
-      return res.status(400).json({ message: 'Invalid role specified' });
-    }
-
     try {
-      await pool.query(insertQuery, values);
-    } catch (dbErr) {
-      console.error('❌ DB insertion error:', dbErr);
-      return res.status(500).json({
-        message: 'Failed to insert user details in database',
-        error: dbErr.message
-      });
-    }
+      // ✅ Insert into the appropriate table using Supabase
+      let data, error;
+      
+      if (role === 'VENDOR') {
+        ({ data, error } = await supabase
+          .from('vendor')
+          .insert([
+            {
+              vendor_id: user_id,
+              vendor_name: display_name,
+              phone_number,
+              email,
+              work
+            }
+          ]));
+      } else if (role === 'SUPPLIER') {
+        ({ data, error } = await supabase
+          .from('suppliers')
+          .insert([
+            {
+              supplier_id: user_id,
+              supplier_name: display_name,
+              phone_number,
+              email,
+              work
+            }
+          ]));
+      } else {
+        return res.status(400).json({ message: 'Invalid role specified' });
+      }
 
-    return res.status(201).json({ message: 'User created successfully', user_id });
+      if (error) {
+        console.error('❌ Supabase insertion error:', error);
+        return res.status(500).json({
+          message: 'Failed to insert user details in database',
+          error: error.message
+        });
+      }
+
+      return res.status(201).json({ message: 'User created successfully', user_id });
+    } catch (err) {
+      console.error('❌ Unexpected server error:', err);
+      return res.status(500).json({ message: 'Server error', error: err.message });
+    }
   } catch (err) {
     console.error('❌ Unexpected server error:', err);
     return res.status(500).json({ message: 'Server error', error: err.message });
