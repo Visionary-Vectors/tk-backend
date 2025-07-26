@@ -76,7 +76,17 @@ exports.createUser = async (req, res) => {
         });
       }
 
-      return res.status(201).json({ message: 'User created successfully', user_id });
+      return res.status(201).json({ 
+        message: 'User created successfully', 
+        user_id,
+        user: {
+          display_name,
+          phone_number,
+          email,
+          role,
+          work
+        }
+      });
     } catch (err) {
       console.error('❌ Unexpected server error:', err);
       return res.status(500).json({ message: 'Server error', error: err.message });
