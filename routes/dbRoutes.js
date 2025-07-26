@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const pool = require('../config/db');
+const supabase = require('../config/db'); // now using supabase client
 
 // Get all vendors
 router.get('/', async (req, res) => {

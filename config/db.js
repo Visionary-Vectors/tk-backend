@@ -1,13 +1,10 @@
 // db.js
 require('dotenv').config();
+const { createClient } = require('@supabase/supabase-js');
 
-const { Pool } = require('pg');
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL, // Use env variable for security
-  ssl: {
-    rejectUnauthorized: false, // Required for Supabase SSL
-  },
-});
-
-module.exports = pool;
+module.exports = supabase;
