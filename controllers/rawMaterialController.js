@@ -1,6 +1,5 @@
 const supabase = require('../config/db');
 
-// GET /api/raw-materials
 exports.getAllRawMaterials = async (req, res) => {
   try {
     const { data, error } = await supabase
