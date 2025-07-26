@@ -1,3 +1,4 @@
+const supabase = require('../config/db'); // now using supabase client
 const { createClient } = require('@supabase/supabase-js');
 
 const supabase = createClient(
@@ -36,60 +37,30 @@ exports.createUser = async (req, res) => {
 
     const user_id = user.user.id;
 
-    // // ✅ Insert into the appropriate table
-    // let insertQuery, values;
+    // ✅ Insert into the appropriate table
+    let insertQuery, values;
 
-    // if (role === 'VENDOR') {
-    //   insertQuery = `INSERT INTO vendor (vendor_id, vendor_name, phone_number, email, work)
-    //                  VALUES ($1, $2, $3, $4, $5)`;
-    //   values = [user_id, display_name, phone_number, email, work];
-    // } else if (role === 'SUPPLIER') {
-    //   insertQuery = `INSERT INTO suppliers (supplier_id, supplier_name, phone_number, email, work)
-    //                  VALUES ($1, $2, $3, $4, $5)`;
-    //   values = [user_id, display_name, phone_number, email, work];
-    // } else {
-    //   return res.status(400).json({ message: 'Invalid role specified' });
-    // }
-
-    // Insert into the appropriate table using Supabase client
-    let insertResult;
     if (role === 'VENDOR') {
-      insertResult = await supabase
-        .from('vendor')
-        .insert([{ vendor_id: user_id, vendor_name: display_name, phone_number, email, work }]);
+      insertQuery = `INSERT INTO vendor (vendor_id, vendor_name, phone_number, email, work)
+                     VALUES ($1, $2, $3, $4, $5)`;
+      values = [user_id, display_name, phone_number, email, work];
     } else if (role === 'SUPPLIER') {
-      insertResult = await supabase
-        .from('suppliers')
-        .insert([{ supplier_id: user_id, supplier_name: display_name, phone_number, email, work }]);
+      insertQuery = `INSERT INTO suppliers (supplier_id, supplier_name, phone_number, email, work)
+                     VALUES ($1, $2, $3, $4, $5)`;
+      values = [user_id, display_name, phone_number, email, work];
     } else {
       return res.status(400).json({ message: 'Invalid role specified' });
     }
 
-//     try {
-//       await pool.query(insertQuery, values);
-//     } catch (dbErr) {
-//       console.error('❌ DB insertion error:', dbErr);
-//       return res.status(500).json({
-//         message: 'Failed to insert user details in database',
-//         error: dbErr.message
-//       });
-//     }
-
-//     return res.status(201).json({ message: 'User created successfully', user_id });
-//   } catch (err) {
-//     console.error('❌ Unexpected server error:', err);
-//     return res.status(500).json({ message: 'Server error', error: err.message });
-//   }
-// };
-
-if (insertResult.error) {
-      console.error('❌ DB insertion error:', insertResult.error); // Already here, good!
+    try {
+      await pool.query(insertQuery, values);
+    } catch (dbErr) {
+      console.error('❌ DB insertion error:', dbErr);
       return res.status(500).json({
         message: 'Failed to insert user details in database',
-        error: insertResult.error.message // This should show you the real cause
+        error: dbErr.message
       });
     }
-
 
     return res.status(201).json({ message: 'User created successfully', user_id });
   } catch (err) {
@@ -97,52 +68,3 @@ if (insertResult.error) {
     return res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
-
-const getUser = async (req, res) => {
-  const { user_id } = req.params;
-
-  if (!user_id) {
-    return res.status(400).json({ message: 'Missing user ID' });
-  }
-
-  try {
-    const { data: user, error } = await supabase.auth.admin.getUserById(user_id);
-
-    if (error) {
-      console.error('❌ Supabase error:', error);
-      return res.status(400).json({ message: 'Supabase user retrieval failed', error: error.message });
-    }
-
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    return res.status(200).json({ message: 'User retrieved successfully', user });
-  } catch (err) {
-    console.error('❌ Unexpected server error:', err);
-    return res.status(500).json({ message: 'Server error', error: err.message });
-  }
-};
-
-const getAllUsers = async (req, res) => {
-  try {
-    const { data: users, error } = await supabase.auth.admin.listUsers();
-
-    if (error) {
-      console.error('❌ Supabase error:', error);
-      return res.status(400).json({ message: 'Supabase users retrieval failed', error: error.message });
-    }
-
-    return res.status(200).json({ message: 'Users retrieved successfully', users: users.users });
-  } catch (err) {
-    console.error('❌ Unexpected server error:', err);
-    return res.status(500).json({ message: 'Server error', error: err.message });
-  }
-};
-
-module.exports = {
-  createUser,
-  getUser,
-  getAllUsers
-};
-
