@@ -10,7 +10,7 @@ router.post(
   supplierController.uploadRawMaterial
 );
 
-router.get('/:supplier_id', suppliercontroller.getSupplierById);
+router.get('/:supplier_id', supplierController.getSupplierById);
 
 
 // Optionally, expose signed URL endpoint if needed
