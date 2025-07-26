@@ -13,8 +13,7 @@ exports.getAllRawMaterials = async (req, res) => {
         rm.supplier_id,
         s.supplier_name
       FROM raw_materials rm
-      LEFT JOIN suppliers s ON rm.supplier_id = s.supplier_id
-      ORDER BY rm.created_at DESC;
+      LEFT JOIN suppliers s ON rm.supplier_id = s.supplier_id;
     `);
 
     res.status(200).json(result.rows);
