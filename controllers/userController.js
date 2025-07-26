@@ -26,6 +26,15 @@ exports.createUser = async (req, res) => {
   }
 });
 
+    if (error) {
+  console.error('Supabase user creation error:', error.message);
+  return res.status(400).json({ message: 'User creation failed', error: error.message });
+}
+
+if (!user || !user.user) {
+  return res.status(500).json({ message: 'User creation failed: no user returned from Supabase' });
+}
+
     const user_id = user.user.id;
 
     console.log('User created in Supabase:', user);
