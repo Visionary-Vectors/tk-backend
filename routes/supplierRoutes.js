@@ -10,6 +10,9 @@ router.post(
   supplierController.uploadRawMaterial
 );
 
+router.get('/:supplier_id', suppliercontroller.getSupplierById);
+
+
 // Optionally, expose signed URL endpoint if needed
 router.get(
   '/image/:filepath',

@@ -1,9 +1,10 @@
-const { createClient } = require('@supabase/supabase-js');
+const supabase = require('../config/db'); // now using supabase client
+// const { createClient } = require('@supabase/supabase-js');
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+// const supabase = createClient(
+//   process.env.SUPABASE_URL,
+//   process.env.SUPABASE_SERVICE_ROLE_KEY
+// );
 
 exports.createUser = async (req, res) => {
   const { display_name, phone_number, email, role, work, password } = req.body;
