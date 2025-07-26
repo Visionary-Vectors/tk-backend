@@ -81,10 +81,7 @@ exports.createUser = async (req, res) => {
         user_id,
         user: {
           display_name,
-          phone_number,
-          email,
           role,
-          work
         }
       });
     } catch (err) {
