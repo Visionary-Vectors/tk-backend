@@ -7,6 +7,9 @@ const dbRoutes = require('./routes/dbRoutes');
 const userRoutes = require('./routes/userRoutes');
 const rawMaterialRoutes = require('./routes/rawMaterialRoutes');
 const vendorRoutes = require('./routes/vendorRoutes')
+const supplierRoutes = require('./routes/supplierRoutes');
+
+
 
 require('dotenv').config(); // Load environment variables
 
@@ -21,6 +24,7 @@ app.use('/db', dbRoutes); // Route prefix
 app.use('/api', userRoutes); // Route now handles /api/create_user
 app.use('/api/raw-materials', rawMaterialRoutes);
 app.use('/api/vendors/:vendor_id', vendorRoutes); // endpoint: /api/vendors/:vendor_id
-app.use('/api/suppliers/:supplier_id', supplierRoutes); // endpoint: /api/suppliers/:supplier_id
+app.use('/api/supplier', supplierRoutes);
+
 
 module.exports = app;

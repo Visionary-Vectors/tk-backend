@@ -23,7 +23,8 @@ exports.createUser = async (req, res) => {
         display_name,
         role,
         phone_number
-      }
+      },
+      email_confirm: true
     });
 
     if (error) {
@@ -91,6 +92,34 @@ exports.createUser = async (req, res) => {
     }
   } catch (err) {
     console.error('❌ Unexpected server error:', err);
+    return res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+exports.loginUser = async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email and password are required' });
+  }
+
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) {
+      return res.status(401).json({ message: 'NOT_FOUND', role: null });
+    }
+
+    // If user is found, return SUCCESS and role
+    const role = data.user?.user_metadata?.role || null;
+    return res.status(200).json({
+      message: 'SUCCESS',
+      role
+    });
+  } catch (err) {
     return res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
