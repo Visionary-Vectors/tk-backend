@@ -1,4 +1,5 @@
 // app.js
+const cors = require('cors');
 const express = require('express');
 const app = express();
 const indexRoutes = require('./routes/indexRoutes');
@@ -11,6 +12,8 @@ require('dotenv').config(); // Load environment variables
 
 // Middleware
 app.use(express.json()); // parse JSON request body
+
+app.use(cors())
 
 // Routes
 app.use('/', indexRoutes);
