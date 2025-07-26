@@ -1,6 +1,5 @@
-const pool = require('../config/db'); // adjust path if needed
+const supabase = require('../config/db');
 
-// GET /api/raw-materials
 exports.getAllRawMaterials = async (req, res) => {
   try {
     const result = await pool.query(`
@@ -13,12 +12,13 @@ exports.getAllRawMaterials = async (req, res) => {
         rm.supplier_id,
         s.supplier_name
       FROM raw_materials rm
-      LEFT JOIN suppliers s ON rm.supplier_id = s.supplier_id;
+      LEFT JOIN suppliers s ON rm.supplier_id = s.supplier_id
+      ORDER BY rm.created_at DESC;
     `);
 
-    res.status(200).json(result.rows);
+    res.status(200).json(data);
   } catch (err) {
-    console.error('Error fetching raw materials:', err.message);
+    console.error('Error:', err.message);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
