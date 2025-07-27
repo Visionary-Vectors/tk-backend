@@ -162,3 +162,30 @@ exports.updateRawMaterial = async (req, res) => {
     res.status(500).json({ message: 'Internal server error', error: err });
   }
 };
+
+// Update order status
+exports.updateOrderStatus = async (req, res) => {
+  const { supplierId, orderId } = req.params;
+  const { order_status } = req.body;
+  // Allowed ENUMS: PENDING, ACCEPTED, REJECTED, SHIPPED, DELIVERED, CANCELLED
+  const allowedStatuses = ['ACCEPTED', 'REJECTED', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
+  if (!order_status || !allowedStatuses.includes(order_status)) {
+    return res.status(400).json({ message: 'Invalid or missing order_status' });
+  }
+  try {
+    const { data, error } = await supabase
+      .from('orders')
+      .update({ order_status })
+      .eq('order_id', orderId)
+      .eq('supplier_id', supplierId)
+      .select()
+      .single();
+    if (error || !data) {
+      return res.status(404).json({ message: 'Order not found or update failed', error });
+    }
+    res.status(200).json({ message: 'Order status updated successfully', order: data });
+  } catch (err) {
+    console.error('Error updating order status:', err);
+    res.status(500).json({ message: 'Internal server error', error: err });
+  }
+};

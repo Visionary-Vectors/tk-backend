@@ -15,6 +15,9 @@ router.get('/:supplier_id', supplierController.getSupplierById);
 // Update raw material
 router.patch('/:supplierId/updateRawMaterial', upload.single('image'), supplierController.updateRawMaterial);
 
+// Update order status
+router.patch('/:supplierId/:orderId/updateOrderStatus', supplierController.updateOrderStatus);
+
 // Optionally, expose signed URL endpoint if needed
 router.get(
   '/image/:filepath',
