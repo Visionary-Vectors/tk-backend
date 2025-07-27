@@ -12,6 +12,8 @@ router.post(
 
 router.get('/:supplier_id', supplierController.getSupplierById);
 
+// Update raw material
+router.patch('/:supplierId/updateRawMaterial', upload.single('image'), supplierController.updateRawMaterial);
 
 // Optionally, expose signed URL endpoint if needed
 router.get(

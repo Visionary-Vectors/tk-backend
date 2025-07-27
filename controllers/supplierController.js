@@ -95,3 +95,68 @@ exports.getSignedImageUrl = async (req, res) => {
 
   res.json({ signedUrl: data.signedUrl });
 };
+
+// Update raw material
+exports.updateRawMaterial = async (req, res) => {
+  const { supplierId } = req.params;
+  const { raw_material_id, name, quantity, unit } = req.body;
+  const file = req.file;
+
+  if (!raw_material_id) {
+    return res.status(400).json({ message: 'raw_material_id is required' });
+  }
+
+  try {
+    let updateFields = {};
+    if (name) updateFields.raw_material_name = name;
+    if (quantity) updateFields.quantity = quantity;
+    if (unit) updateFields.unit = unit;
+
+    // If a new image is uploaded, upload to Supabase and update rm_pictures
+    if (file) {
+      const fs = require('fs');
+      const fileBuffer = fs.readFileSync(file.path);
+      const filePath = `materials/${file.filename}`;
+
+      // Get the old image path to delete after successful upload
+      const { data: oldData, error: oldError } = await supabase
+        .from('raw_materials')
+        .select('rm_pictures')
+        .eq('raw_material_id', raw_material_id)
+        .single();
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('raw-material-images')
+        .upload(filePath, fileBuffer, {
+          contentType: file.mimetype,
+          upsert: true
+        });
+      if (uploadError) {
+        return res.status(500).json({ message: 'Image upload failed', error: uploadError });
+      }
+      updateFields.rm_pictures = filePath;
+
+      // Delete old image from storage if it exists
+      if (oldData && oldData.rm_pictures) {
+        await supabase.storage.from('raw-material-images').remove([oldData.rm_pictures]);
+      }
+    }
+
+    const { data, error } = await supabase
+      .from('raw_materials')
+      .update(updateFields)
+      .eq('raw_material_id', raw_material_id)
+      .eq('supplier_id', supplierId)
+      .select()
+      .single();
+
+    if (error || !data) {
+      return res.status(404).json({ message: 'Raw material not found or update failed', error });
+    }
+
+    res.status(200).json({ message: 'Raw material updated successfully', rawMaterial: data });
+  } catch (err) {
+    console.error('Error updating raw material:', err);
+    res.status(500).json({ message: 'Internal server error', error: err });
+  }
+};
