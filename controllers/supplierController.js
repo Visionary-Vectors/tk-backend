@@ -189,3 +189,21 @@ exports.updateOrderStatus = async (req, res) => {
     res.status(500).json({ message: 'Internal server error', error: err });
   }
 };
+
+// Get all raw materials for a supplier
+exports.getRawMaterialsBySupplier = async (req, res) => {
+  const { supplierId } = req.params;
+  try {
+    const { data, error } = await supabase
+      .from('raw_materials')
+      .select('*')
+      .eq('supplier_id', supplierId);
+    if (error) {
+      return res.status(500).json({ message: 'Failed to fetch raw materials', error });
+    }
+    res.status(200).json({ rawMaterials: data });
+  } catch (err) {
+    console.error('Error fetching raw materials:', err);
+    res.status(500).json({ message: 'Internal server error', error: err });
+  }
+};

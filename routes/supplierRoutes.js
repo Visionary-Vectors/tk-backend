@@ -24,4 +24,7 @@ router.get(
   supplierController.getSignedImageUrl
 );
 
+// Get all raw materials for a supplier
+router.get('/:supplierId/rawMaterials', supplierController.getRawMaterialsBySupplier);
+
 module.exports = router;
