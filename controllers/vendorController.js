@@ -295,3 +295,51 @@ exports.getOrderByVendor = async (req, res) => {
     res.status(500).json({ message: 'Internal server error', error: err });
   }
 };
+
+// DELETE /api/vendor/:vendorId/:orderId/deleteorder
+exports.deleteOrderByVendor = async (req, res) => {
+  const { vendorId, orderId } = req.params;
+  try {
+    // Find all order rows for this orderId and vendorId (could be multiple raw_material_id)
+    const { data: orders, error: findError } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('order_id', orderId)
+      .eq('vendor_id', vendorId);
+    if (findError) {
+      return res.status(500).json({ message: 'Failed to find order(s)', error: findError });
+    }
+    if (!orders || orders.length === 0) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+    // For each order row, add back the order_quantity to raw_materials
+    for (const order of orders) {
+      const { raw_material_id, order_quantity } = order;
+      // Get current stock
+      const { data: material } = await supabase
+        .from('raw_materials')
+        .select('raw_material_quantity')
+        .eq('raw_material_id', raw_material_id)
+        .single();
+      if (material) {
+        await supabase
+          .from('raw_materials')
+          .update({ raw_material_quantity: material.raw_material_quantity + order_quantity })
+          .eq('raw_material_id', raw_material_id);
+      }
+    }
+    // Delete all order rows for this orderId and vendorId
+    const { error: deleteError } = await supabase
+      .from('orders')
+      .delete()
+      .eq('order_id', orderId)
+      .eq('vendor_id', vendorId);
+    if (deleteError) {
+      return res.status(500).json({ message: 'Failed to delete order(s)', error: deleteError });
+    }
+    res.status(200).json({ message: 'Order deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting order:', err);
+    res.status(500).json({ message: 'Internal server error', error: err });
+  }
+};
