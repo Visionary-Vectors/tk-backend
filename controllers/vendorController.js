@@ -63,15 +63,15 @@ exports.createOrder = async (req, res) => {
         .from('orders')
         .insert([
           {
-            vendor_id: vendorId,
-            raw_material_id: raw_material_id,
-            supplier_id: material.supplier_id, // <-- Save supplier_id
-            order_status,
-            order_datetime,
-            created_at: created_at_value,
-            order_amount,
-            order_quantity,
-            order_unit
+        vendor_id: vendorId,
+        raw_material_id: raw_material_id,
+        supplier_id: material.supplier_id, // <-- Save supplier_id
+        order_status,
+        order_datetime,
+        created_at: created_at_value,
+        order_amount,
+        order_quantity,
+        order_unit
           }
         ])
         .select()
@@ -341,5 +341,23 @@ exports.deleteOrderByVendor = async (req, res) => {
   } catch (err) {
     console.error('Error deleting order:', err);
     res.status(500).json({ message: 'Internal server error', error: err });
+  }
+};
+
+// GET /api/vendor/:vendorId - get vendor by id
+exports.getVendorById = async (req, res) => {
+  const { vendorId } = req.params;
+  try {
+    const { data, error } = await supabase
+      .from('vendor')
+      .select('*')
+      .eq('vendor_id', vendorId)
+      .single();
+    if (error || !data) {
+      return res.status(404).json({ error: 'Vendor not found' });
+    }
+    res.status(200).json(data);
+  } catch (err) {
+    res.status(500).json({ error: 'Internal server error' });
   }
 };
