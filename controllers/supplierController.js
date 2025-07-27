@@ -1,5 +1,7 @@
 const supabase = require('../config/db');
 
+
+=======
 const fs = require('fs');
 const { createClient } = require('@supabase/supabase-js');
 
@@ -7,22 +9,20 @@ const { createClient } = require('@supabase/supabase-js');
 
 exports.getSupplierById = async (req, res) => {
   const { supplier_id } = req.params;
-
+exports.getSupplierOrders = async (req, res) => {
+  const { supplierId } = req.params;
   try {
     const { data, error } = await supabase
-      .from('suppliers')
+      .from('orders')
       .select('*')
-      .eq('supplier_id', supplier_id)
-      .single();
+      .eq('supplier_id', supplierId);
 
-    if (error || !data) {
-      return res.status(404).json({ error: 'Supplier not found' });
-    }
+    if (error) throw error;
 
     res.status(200).json(data);
   } catch (err) {
-    console.error('Error fetching supplier:', err.message);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Supplier order fetch error:', err.message);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 };
 

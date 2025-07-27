@@ -6,25 +6,26 @@ const indexRoutes = require('./routes/indexRoutes');
 const dbRoutes = require('./routes/dbRoutes');
 const userRoutes = require('./routes/userRoutes');
 const rawMaterialRoutes = require('./routes/rawMaterialRoutes');
-const vendorRoutes = require('./routes/vendorRoutes')
+const vendorRoutes = require('./routes/vendorRoutes');
 const supplierRoutes = require('./routes/supplierRoutes');
-
-
+const bodyParser = require('body-parser');
 
 require('dotenv').config(); // Load environment variables
 
-
 // Middleware
 app.use(express.json()); // parse JSON request body
-app.use(cors())
+app.use(cors());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // Routes
 app.use('/', indexRoutes);
-app.use('/db', dbRoutes); // Route prefix
-app.use('/api', userRoutes); // Route now handles /api/create_user
+app.use('/db', dbRoutes);
+app.use('/api', userRoutes);
 app.use('/api/raw-materials', rawMaterialRoutes);
+
 app.use('/api/vendor', vendorRoutes); // endpoint: /api/vendors/:vendor_id
 app.use('/api/supplier', supplierRoutes);
+
 
 
 module.exports = app;
