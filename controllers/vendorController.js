@@ -208,3 +208,90 @@ exports.updateOrderQuantitiesByVendor = async (req, res) => {
     res.status(500).json({ message: 'Internal server error', error: err.message || err });
   }
 };
+
+// // GET /api/vendor/:vendorId/orders - get all orders for a vendor
+// exports.getAllOrdersByVendor = async (req, res) => {
+//   const { vendorId } = req.params;
+//   try {
+//     const { data: orders, error } = await supabase
+//       .from('orders')
+//       .select('*')
+//       .eq('vendor_id', vendorId);
+//     if (error) {
+//       return res.status(500).json({ message: 'Failed to fetch orders', error });
+//     }
+//     // For each order, fetch raw_material and supplier info
+//     const ordersWithDetails = await Promise.all(orders.map(async (order) => {
+//       const { raw_material_id } = order;
+//       // Get raw material info
+//       const { data: material } = await supabase
+//         .from('raw_materials')
+//         .select('*')
+//         .eq('raw_material_id', raw_material_id)
+//         .single();
+//       // Get supplier info
+//       let supplierInfo = null;
+//       if (material && material.supplier_id) {
+//         const { data: supplier } = await supabase
+//           .from('suppliers')
+//           .select('*')
+//           .eq('supplier_id', material.supplier_id)
+//           .single();
+//         supplierInfo = supplier;
+//       }
+//       // Filter raw_material fields
+//       const { raw_material_quantity, unit, created_at, rm_pictures, supplier_id, ...materialSafe } = material || {};
+//       return {
+//         ...order,
+//         raw_material: materialSafe,
+//         supplier: supplierInfo
+//       };
+//     }));
+//     res.status(200).json({ orders: ordersWithDetails });
+//   } catch (err) {
+//     console.error('Error fetching vendor orders:', err);
+//     res.status(500).json({ message: 'Internal server error', error: err });
+//   }
+// };
+
+// GET /api/vendor/:vendorId/:orderId - get a single order for a vendor
+exports.getOrderByVendor = async (req, res) => {
+  const { vendorId, orderId } = req.params;
+  try {
+    const { data: order, error } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('vendor_id', vendorId)
+      .eq('order_id', orderId)
+      .single();
+    if (error || !order) {
+      return res.status(404).json({ message: 'Order not found', error });
+    }
+    // Get raw material info
+    const { data: material } = await supabase
+      .from('raw_materials')
+      .select('*')
+      .eq('raw_material_id', order.raw_material_id)
+      .single();
+    // Get supplier info
+    let supplierInfo = null;
+    if (material && material.supplier_id) {
+      const { data: supplier } = await supabase
+        .from('suppliers')
+        .select('*')
+        .eq('supplier_id', material.supplier_id)
+        .single();
+      supplierInfo = supplier;
+    }
+    // Filter raw_material fields
+    const { raw_material_quantity, unit, created_at, rm_pictures, supplier_id, ...materialSafe } = material || {};
+    res.status(200).json({
+      ...order,
+      raw_material: materialSafe,
+      supplier: supplierInfo
+    });
+  } catch (err) {
+    console.error('Error fetching order:', err);
+    res.status(500).json({ message: 'Internal server error', error: err });
+  }
+};
