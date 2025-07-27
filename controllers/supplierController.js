@@ -30,7 +30,7 @@ exports.getSupplierById = async (req, res) => {
 // Upload raw material with image
 exports.uploadRawMaterial = async (req, res) => {
   const { supplierId } = req.params;
-  const { name, quantity, unit } = req.body;
+  const { name, raw_material_quantity, unit, raw_material_price } = req.body;
   const file = req.file;
 
   if (!file) {
@@ -57,8 +57,9 @@ exports.uploadRawMaterial = async (req, res) => {
       .insert([
         {
           raw_material_name: name,
-          quantity,
+          raw_material_quantity,
           unit,
+          raw_material_price,
           supplier_id: supplierId,
           created_at: new Date().toISOString(),
           rm_pictures: filePath
@@ -99,7 +100,7 @@ exports.getSignedImageUrl = async (req, res) => {
 // Update raw material
 exports.updateRawMaterial = async (req, res) => {
   const { supplierId } = req.params;
-  const { raw_material_id, name, quantity, unit } = req.body;
+  const { raw_material_id, name, raw_material_quantity, unit, raw_material_price } = req.body;
   const file = req.file;
 
   if (!raw_material_id) {
@@ -109,8 +110,9 @@ exports.updateRawMaterial = async (req, res) => {
   try {
     let updateFields = {};
     if (name) updateFields.raw_material_name = name;
-    if (quantity) updateFields.quantity = quantity;
+    if (raw_material_quantity) updateFields.raw_material_quantity = raw_material_quantity;
     if (unit) updateFields.unit = unit;
+    if (raw_material_price) updateFields.raw_material_price = raw_material_price;
 
     // If a new image is uploaded, upload to Supabase and update rm_pictures
     if (file) {
