@@ -7,7 +7,9 @@ const supabase = require('../config/db'); // now using supabase client
 // );
 
 exports.createUser = async (req, res) => {
-  const { display_name, phone_number, email, role, work, password } = req.body;
+  const { display_name, phone_number, email, role, password } = req.body;
+  // Only take work if role is SUPPLIER
+  const work = (role === 'SUPPLIER') ? req.body.work : undefined;
 
   // ✅ Check for required fields
   if (!display_name || !phone_number || !email || !role || !password) {
@@ -23,7 +25,8 @@ exports.createUser = async (req, res) => {
         display_name,
         role,
         phone_number
-      }
+      },
+      email_confirm: true
     });
 
     if (error) {
@@ -49,8 +52,8 @@ exports.createUser = async (req, res) => {
               vendor_id: user_id,
               vendor_name: display_name,
               phone_number,
-              email,
-              work
+              email
+              // work column removed for VENDOR
             }
           ]));
       } else if (role === 'SUPPLIER') {
@@ -62,7 +65,7 @@ exports.createUser = async (req, res) => {
               supplier_name: display_name,
               phone_number,
               email,
-              work
+              work // only for SUPPLIER
             }
           ]));
       } else {
@@ -91,6 +94,36 @@ exports.createUser = async (req, res) => {
     }
   } catch (err) {
     console.error('❌ Unexpected server error:', err);
+    return res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+exports.loginUser = async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email and password are required' });
+  }
+
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) {
+      return res.status(401).json({ message: 'NOT_FOUND', role: null });
+    }
+
+    // If user is found, return SUCCESS, role, and userId
+    const role = data.user?.user_metadata?.role || null;
+    const userId = data.user?.id || null;
+    return res.status(200).json({
+      message: 'SUCCESS',
+      role,
+      userId
+    });
+  } catch (err) {
     return res.status(500).json({ message: 'Server error', error: err.message });
   }
 };

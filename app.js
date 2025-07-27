@@ -9,6 +9,7 @@ const rawMaterialRoutes = require('./routes/rawMaterialRoutes');
 const vendorRoutes = require('./routes/vendorRoutes');
 const supplierRoutes = require('./routes/supplierRoutes');
 const bodyParser = require('body-parser');
+
 require('dotenv').config(); // Load environment variables
 
 // Middleware
@@ -22,8 +23,9 @@ app.use('/db', dbRoutes);
 app.use('/api', userRoutes);
 app.use('/api/raw-materials', rawMaterialRoutes);
 
-// ✅ Fixed these two lines:
-app.use('/api/vendors', vendorRoutes);      // will match /api/vendors/:vendorId/orders
-app.use('/api/suppliers', supplierRoutes);  // will match /api/suppliers/:supplierId/orders
+app.use('/api/vendor', vendorRoutes); // endpoint: /api/vendors/:vendor_id
+app.use('/api/supplier', supplierRoutes);
+
+
 
 module.exports = app;

@@ -2,20 +2,13 @@ const supabase = require('../config/db');
 
 exports.getAllRawMaterials = async (req, res) => {
   try {
-    const result = await pool.query(`
-      SELECT 
-        rm.raw_material_id,
-        rm.raw_material_name,
-        rm.quantity,
-        rm.unit,
-        rm.created_at,
-        rm.supplier_id,
-        s.supplier_name
-      FROM raw_materials rm
-      LEFT JOIN suppliers s ON rm.supplier_id = s.supplier_id
-      ORDER BY rm.created_at DESC;
-    `);
-
+    const { data, error } = await supabase
+      .from('raw_materials')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (error) {
+      throw error;
+    }
     res.status(200).json(data);
   } catch (err) {
     console.error('Error:', err.message);
