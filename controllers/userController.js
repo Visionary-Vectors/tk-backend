@@ -7,7 +7,9 @@ const supabase = require('../config/db'); // now using supabase client
 // );
 
 exports.createUser = async (req, res) => {
-  const { display_name, phone_number, email, role, work, password } = req.body;
+  const { display_name, phone_number, email, role, password } = req.body;
+  // Only take work if role is SUPPLIER
+  const work = (role === 'SUPPLIER') ? req.body.work : undefined;
 
   // ✅ Check for required fields
   if (!display_name || !phone_number || !email || !role || !password) {
@@ -50,8 +52,8 @@ exports.createUser = async (req, res) => {
               vendor_id: user_id,
               vendor_name: display_name,
               phone_number,
-              email,
-              work
+              email
+              // work column removed for VENDOR
             }
           ]));
       } else if (role === 'SUPPLIER') {
@@ -63,7 +65,7 @@ exports.createUser = async (req, res) => {
               supplier_name: display_name,
               phone_number,
               email,
-              work
+              work // only for SUPPLIER
             }
           ]));
       } else {
