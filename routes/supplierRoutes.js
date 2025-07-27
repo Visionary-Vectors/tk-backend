@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const controller = require('../controllers/supplierController');
+const controller = require('../controllers/supplierController'); // ✅ must be correct path
 
-router.get('/:supplier_id', controller.getSupplierById);
+// ✅ Route for supplier orders
+router.get('/:supplierId/orders', controller.getSupplierOrders);
 
 module.exports = router;

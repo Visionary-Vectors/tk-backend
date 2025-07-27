@@ -1,22 +1,19 @@
 const supabase = require('../config/db');
 
-exports.getVendorById = async (req, res) => {
-  const { vendor_id } = req.params;
+exports.getVendorOrders = async (req, res) => {
+  const { vendorId } = req.params;
 
   try {
     const { data, error } = await supabase
-      .from('vendor')
+      .from('orders')
       .select('*')
-      .eq('vendor_id', vendor_id)
-      .single();
+      .eq('vendor_id', vendorId);
 
-    if (error || !data) {
-      return res.status(404).json({ error: 'Vendor not found' });
-    }
+    if (error) throw error;
 
     res.status(200).json(data);
   } catch (err) {
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Vendor order fetch error:', err.message);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 };
-// controllers/vendorController.js

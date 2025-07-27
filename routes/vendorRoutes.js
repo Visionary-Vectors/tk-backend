@@ -1,7 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const vendorController = require('../controllers/vendorController');
 
-router.get('/:vendor_id', vendorController.getVendorById);
+// ✅ This is missing in your code
+const controller = require('../controllers/vendorController');
+
+// ✅ Now this works
+router.get('/:vendorId/orders', controller.getVendorOrders);
 
 module.exports = router;
