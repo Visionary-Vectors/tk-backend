@@ -66,6 +66,7 @@ exports.createOrder = async (req, res) => {
           {
             vendor_id: vendorId,
             raw_material_id: raw_material_id,
+            supplier_id: material.supplier_id, // <-- Save supplier_id
             order_status,
             order_datetime,
             created_at: created_at_value,
