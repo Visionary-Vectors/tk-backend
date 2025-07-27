@@ -113,11 +113,13 @@ exports.loginUser = async (req, res) => {
       return res.status(401).json({ message: 'NOT_FOUND', role: null });
     }
 
-    // If user is found, return SUCCESS and role
+    // If user is found, return SUCCESS, role, and userId
     const role = data.user?.user_metadata?.role || null;
+    const userId = data.user?.id || null;
     return res.status(200).json({
       message: 'SUCCESS',
-      role
+      role,
+      userId
     });
   } catch (err) {
     return res.status(500).json({ message: 'Server error', error: err.message });
