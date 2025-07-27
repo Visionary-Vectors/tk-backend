@@ -4,7 +4,7 @@ exports.getAllRawMaterials = async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('raw_materials')
-      .select('raw_material_id, raw_material_name, raw_material_quantity, unit, raw_material_price, created_at, supplier_id, suppliers(supplier_name)')
+      .select('*')
       .order('created_at', { ascending: false });
     if (error) {
       throw error;
